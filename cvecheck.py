@@ -56,12 +56,16 @@ def checkCVE(input, output):
     df_cve_epss_kev = pd.merge(df_cve_epss, df_kev, how="left", on=["cve"])
     df_cve_epss_kev["kev"] = [0 if pd.isna(vendor) else 1 for vendor in df_cve_epss_kev["vendorProject"]]
     df_cve_epss_kev["epss"] = df_cve_epss_kev["epss"].astype(float)
+    df_cve_epss_kev["cvss"] = df_cve_epss_kev["cvss"].fillna(5)
+    # Fill all remaining NaN with 0
+    df_cve_epss_kev = df_cve_epss_kev.fillna(0)
     # If CVSS is not present, we use 0.1 as CVSS as it is the minimum score for CVSS
-    df_cve_epss_kev["cvss"] = [0.1 if pd.isna(cvss) else cvss for cvss in df_cve_epss_kev["cvss"]]
-    df_cve_epss_kev["base_score"] = (df_cve_epss_kev["cvss"]/10)*df_cve_epss_kev["epss"]
-    df_cve_epss_kev["final_score"] = df_cve_epss_kev["base_score"].where(df_cve_epss_kev["kev"] < 1, df_cve_epss_kev["base_score"] + 0.1)
-    df_cve_epss_kev["aver_score"] = ((df_cve_epss_kev["cvss"]/10)+df_cve_epss_kev["epss"]+df_cve_epss_kev["kev"])/3
-    
+    #df_cve_epss_kev["cvss"] = [0.1 if pd.isna(cvss) else cvss for cvss in df_cve_epss_kev["cvss"]]
+    #df_cve_epss_kev["base_score"] = (df_cve_epss_kev["cvss"]/10)*df_cve_epss_kev["epss"]
+    #df_cve_epss_kev["final_score"] = df_cve_epss_kev["base_score"].where(df_cve_epss_kev["kev"] < 1, df_cve_epss_kev["base_score"] + 0.1)
+    #df_cve_epss_kev["aver_score"] = ((df_cve_epss_kev["cvss"]/10)+df_cve_epss_kev["epss"]+df_cve_epss_kev["kev"])/3
+    df_cve_epss_kev["score"] = (((df_cve_epss_kev["cvss"]/10)*0.5)+(df_cve_epss_kev["epss"]*0.3)+(df_cve_epss_kev["kev"]*0.2))*100
+
     print(df_cve_epss_kev.head())
 
     # Export results to Excel
