@@ -66,6 +66,8 @@ def checkCVE(input, output):
     #df_cve_epss_kev["aver_score"] = ((df_cve_epss_kev["cvss"]/10)+df_cve_epss_kev["epss"]+df_cve_epss_kev["kev"])/3
     df_cve_epss_kev["score"] = (((df_cve_epss_kev["cvss"]/10)*0.5)+(df_cve_epss_kev["epss"]*0.3)+(df_cve_epss_kev["kev"]*0.2))*100
 
+    # Sort the dataframe by score descendant
+    df_cve_epss_kev.sort_values(by=["score"], ascending=False, inplace=True)
     print(df_cve_epss_kev.head())
 
     # Export results to Excel
